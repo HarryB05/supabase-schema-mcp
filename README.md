@@ -96,7 +96,3 @@ All tools accept `schema_name` (default `"public"`); use `schema_name="all"` to 
 ## Read-only safety model
 
 This MCP server is designed to **read** schema and metadata only. It does not execute arbitrary writes or DDL. Database access should use a **read-only** Postgres role where possible; the connection layer enforces that only introspection-style, read-only operations are performed. Management API usage is limited to reading project/config data as needed. Never put a role with write or DDL privileges into this server's configuration unless you explicitly require it for a future feature.
-
-## License
-
-MIT. See [LICENSE](LICENSE).
