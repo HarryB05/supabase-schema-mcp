@@ -28,7 +28,7 @@ All tools accept `schema_name` (default `"public"`); use `schema_name="all"` to 
 
 ## Setup
 
-1. Clone the repo and **cd into the project directory** (the `supabase-schema-mcp` folder). All commands below must be run from this directory.
+1. Clone the repo. All commands below must be run from the **repo root** (the directory that contains `pyproject.toml` and `src/`).
 2. Create a virtual environment and install dependencies with **uv**:
    ```bash
    uv sync --extra dev
@@ -36,7 +36,7 @@ All tools accept `schema_name` (default `"public"`); use `schema_name="all"` to 
 3. Copy `.env.example` to `.env` and set your Supabase Postgres connection:
    - **Required**: `SUPABASE_DB_HOST` (e.g. `db.<project_ref>.supabase.co`), `SUPABASE_DB_USER` (usually `postgres`), `SUPABASE_DB_PASSWORD` (from Project Settings > Database)
    - Optional: `SUPABASE_DB_PORT`, `SUPABASE_DB_NAME`
-4. From the **same project directory**, run the MCP server over stdio:
+4. From the **repo root**, run the MCP server over stdio:
    ```bash
    uv run python -m supabase_schema_mcp.server
    ```
@@ -49,7 +49,7 @@ All tools accept `schema_name` (default `"public"`); use `schema_name="all"` to 
 
 1. Open Cursor **Settings** (e.g. **Cursor > Settings** or `Cmd+,`).
 2. Search for **MCP** or open **Features > MCP**.
-3. Add this server via the JSON config. Edit **`~/.cursor/mcp.json`** (or your project's `.cursor/mcp.json`) and add a `supabase-schema-mcp` entry under `mcpServers`. Replace `PATH_TO_SUPABASE_SCHEMA_MCP` with the full path to this repo (the folder that contains `pyproject.toml` and `src/`):
+3. Add this server via the JSON config. Edit **`~/.cursor/mcp.json`** (or your project's `.cursor/mcp.json`) and add a `supabase-schema-mcp` entry under `mcpServers`. Replace `PATH_TO_SUPABASE_SCHEMA_MCP` with the full path to the **repo root** (the folder that contains `pyproject.toml` and `src/`):
 
    ```json
    {
@@ -78,7 +78,7 @@ All tools accept `schema_name` (default `"public"`); use `schema_name="all"` to 
          "command": "uv",
          "args": [
            "--directory",
-           "/Users/you/Developer/supabase-schema-mcp",
+           "/Users/you/Developer/supabase-mcp",
            "run",
            "python",
            "-m",
