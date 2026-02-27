@@ -2,29 +2,19 @@
 
 ![MCP Inspector with supabase-schema-mcp](docs/mcp-inspector-screenshot.png)
 
-An MCP (Model Context Protocol) server that provides **deep schema introspection** for Supabase/Postgres projects. It complements the [official Supabase MCP](https://github.com/supabase/supabase-mcp) by focusing on detailed schema metadata: tables, columns, views, enums, RLS policies, functions/RPCs, foreign keys, indexes, and triggers. It does not duplicate high-level project or API features; it goes deeper on database structure for tooling and documentation.
+An MCP server that provides deep schema introspection for Supabase/Postgres. I built it because the [official Supabase MCP](https://github.com/supabase/supabase-mcp) focuses on project overview, branches, and API usage; it does not expose the kind of schema detail needed for migrations, RLS audits, relationship graphs, or RPC/trigger discovery.
 
-## How this complements the official Supabase MCP
+## Why this exists (limitations of Supabase’s MCP)
 
-The official Supabase MCP covers project overview, branches, and API usage. This server is intentionally scoped to **introspection only**: it connects to your Supabase Postgres (and optionally the Management API) to expose schema details that help with migrations, RLS audits, relationship graphs, and RPC/trigger discovery. Use the official MCP for project management; use this one when you need fine-grained schema information.
+The official Supabase MCP is great for project-level and API workflows. It does not, however, give tools or agents fine-grained access to your **database schema**: tables, columns, views, enums, RLS policies, functions/RPCs, foreign keys, indexes, and triggers. If you want an AI or tool to reason about your schema (e.g. “which tables have RLS?”, “what does this RPC look like?”, “what FKs reference this table?”), you either run custom SQL yourself or use something that introspects the DB. This server fills that gap by connecting directly to your Supabase Postgres and exposing schema-only, read-only tools.
 
-## Tool list
+## What this one does that Supabase’s doesn’t
 
-| Tool | Description |
-|------|-------------|
-| `schema_list_tables` | List tables (optionally `schema_name='all'` for all user schemas). |
-| `schema_list_columns` | List columns; optional `table_name` to restrict to one table. |
-| `schema_list_views` | List views in the schema. |
-| `schema_list_enums` | List custom enum types. |
-| `rls_list_policies` | List RLS policies (table, policy, command, USING/WITH CHECK). |
-| `rls_list_coverage` | Report which tables have RLS enabled and policy counts. |
-| `functions_list` | List Postgres functions (signature, return type). |
-| `functions_list_rpc_candidates` | List functions that are typical Supabase RPC candidates. |
-| `relationships_list_foreign_keys` | List foreign key constraints. |
-| `relationships_list_indexes` | List indexes; optional `table_name` filter. |
-| `triggers_list` | List triggers; optional `table_name` filter. |
+- **Schema introspection only**: tables, columns, views, enums, RLS policies (and coverage), functions (including RPC candidates), foreign keys, indexes, triggers.
+- **No project/API scope**: no branches, no API calls; just database structure. Use the official MCP for project management; use this one when you need schema metadata.
+- **Read-only**: designed for introspection only; no writes or DDL. Suited to a read-only Postgres role.
 
-All tools accept `schema_name` (default `"public"`); use `schema_name="all"` to include all user schemas (excluding `pg_catalog` and `information_schema`).
+Full tool list and parameters are in [**Tools reference**](docs/tools-reference.md).
 
 ## Setup
 
