@@ -62,6 +62,16 @@ async def rls_list_coverage(schema_name: str = "public") -> str:
     return await tools_rls.list_rls_coverage(schema_name)
 
 
+@mcp.tool()
+async def rls_get_policy(
+    schema_name: str, table_name: str, policy_name: str
+) -> str:
+    """Return the definition (USING and WITH CHECK code) of an RLS policy by name."""
+    return await tools_rls.get_rls_policy_definition(
+        schema_name, table_name, policy_name
+    )
+
+
 # ---- Function / RPC tools ----
 @mcp.tool()
 async def functions_list(schema_name: str = "public") -> str:
@@ -73,6 +83,12 @@ async def functions_list(schema_name: str = "public") -> str:
 async def functions_list_rpc_candidates(schema_name: str = "public") -> str:
     """List Supabase RPC-callable function candidates. schema_name='all' for all."""
     return await tools_functions.list_rpc_candidates(schema_name)
+
+
+@mcp.tool()
+async def functions_get_definition(schema_name: str, function_name: str) -> str:
+    """Return the full source code (CREATE FUNCTION) of an RPC/function by name."""
+    return await tools_functions.get_function_definition(schema_name, function_name)
 
 
 # ---- Relationship tools ----

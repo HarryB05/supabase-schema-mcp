@@ -8,8 +8,10 @@
 | `schema_list_enums` | List custom enum types. |
 | `rls_list_policies` | List RLS policies (table, policy, command, USING/WITH CHECK). |
 | `rls_list_coverage` | Report which tables have RLS enabled and policy counts. |
+| `rls_get_policy` | Return the definition (USING and WITH CHECK code) of an RLS policy by schema, table and policy name. |
 | `functions_list` | List Postgres functions (signature, return type). |
 | `functions_list_rpc_candidates` | List functions that are typical Supabase RPC candidates. |
+| `functions_get_definition` | Return the full source code (CREATE FUNCTION) of an RPC/function by schema and name. |
 | `relationships_list_foreign_keys` | List foreign key constraints. |
 | `relationships_list_indexes` | List indexes; optional `table_name` filter. |
 | `triggers_list` | List triggers; optional `table_name` filter. |

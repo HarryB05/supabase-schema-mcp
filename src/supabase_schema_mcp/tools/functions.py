@@ -2,7 +2,7 @@
 
 import json
 
-from supabase_schema_mcp.db import fetch_all
+from supabase_schema_mcp.db import fetch_all, fetch_one
 
 
 async def list_functions(schema_name: str = "public") -> str:
@@ -39,6 +39,34 @@ async def list_functions(schema_name: str = "public") -> str:
             "security_definer": r["security_definer"],
             "volatility": _volatility_str(r["volatility"]),
         }
+        for r in rows
+    ]
+    return json.dumps(result, indent=2)
+
+
+async def get_function_definition(schema_name: str, function_name: str) -> str:
+    """
+    Return the full definition (source code) of a function/RPC by schema and name.
+    If the function is overloaded (same name, different arguments), returns all definitions.
+    """
+    query = """
+        SELECT pg_get_functiondef(p.oid) AS definition,
+               pg_get_function_arguments(p.oid) AS arguments
+        FROM pg_proc p
+        JOIN pg_namespace n ON n.oid = p.pronamespace
+        WHERE n.nspname = $1 AND p.proname = $2
+        ORDER BY pg_get_function_arguments(p.oid)
+    """
+    rows = await fetch_all(query, schema_name, function_name)
+    if not rows:
+        return json.dumps(
+            {"error": f"No function named {function_name!r} in schema {schema_name!r}"},
+            indent=2,
+        )
+    if len(rows) == 1:
+        return rows[0]["definition"] or ""
+    result = [
+        {"arguments": r["arguments"], "definition": r["definition"]}
         for r in rows
     ]
     return json.dumps(result, indent=2)

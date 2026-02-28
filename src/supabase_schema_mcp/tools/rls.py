@@ -2,7 +2,7 @@
 
 import json
 
-from supabase_schema_mcp.db import fetch_all
+from supabase_schema_mcp.db import fetch_all, fetch_one
 
 
 async def list_rls_policies(schema_name: str = "public") -> str:
@@ -45,6 +45,49 @@ async def list_rls_policies(schema_name: str = "public") -> str:
         for r in rows
     ]
     return json.dumps(result, indent=2)
+
+
+async def get_rls_policy_definition(
+    schema_name: str, table_name: str, policy_name: str
+) -> str:
+    """
+    Return the definition (USING and WITH CHECK expressions) of a single RLS policy
+    by schema, table and policy name. Returns the policy metadata and the expression
+    code so you can see exactly what the policy does.
+    """
+    query = """
+        SELECT n.nspname AS schema_name, c.relname AS table_name,
+               p.polname AS policy_name, p.polcmd AS command,
+               CASE p.polpermissive
+                   WHEN true THEN 'PERMISSIVE' ELSE 'RESTRICTIVE'
+               END AS type,
+               pg_get_expr(p.polqual, p.polrelid) AS using_expr,
+               pg_get_expr(p.polwithcheck, p.polrelid) AS with_check_expr
+        FROM pg_policy p
+        JOIN pg_class c ON c.oid = p.polrelid
+        JOIN pg_namespace n ON n.oid = c.relnamespace
+        WHERE n.nspname = $1 AND c.relname = $2 AND p.polname = $3
+          AND c.relkind = 'r'
+    """
+    row = await fetch_one(query, schema_name, table_name, policy_name)
+    if not row:
+        return json.dumps(
+            {
+                "error": f"No RLS policy named {policy_name!r} on {schema_name}.{table_name}"
+            },
+            indent=2,
+        )
+    cmd = _polcmd_to_str(row["command"])
+    out = {
+        "schema": row["schema_name"],
+        "table": row["table_name"],
+        "policy": row["policy_name"],
+        "command": cmd,
+        "type": row["type"],
+        "using": row["using_expr"],
+        "with_check": row["with_check_expr"],
+    }
+    return json.dumps(out, indent=2)
 
 
 def _polcmd_to_str(cmd: str | None) -> str:
